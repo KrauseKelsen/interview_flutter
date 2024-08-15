@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../domain/entities/current_conditon.dart';
+import '../../widgets/widgets.dart';
+
 class MyLocationsView extends StatelessWidget {
   const MyLocationsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    //final myLocationsList = [];
+  List<CurrentCondition> currentConditions = [];
 
-    return const _BlankList();
+
+    return (currentConditions.isNotEmpty) ? const _BlankList() : 
+    ListView(
+          padding: const EdgeInsets.all(8.0),
+          children: const [
+            CityCard(
+              cityName: 'Miami',
+              description: 'This is my favorite city.',
+              time: '11:00 AM',
+              icon: Icons.wb_sunny,
+            ),
+            // Puedes agregar más CityCard aquí si lo deseas
+          ],
+        );
   }
 }
 
