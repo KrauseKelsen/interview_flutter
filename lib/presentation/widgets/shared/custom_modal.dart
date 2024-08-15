@@ -1,33 +1,59 @@
-import 'package:flutter/material.dart';
-import 'package:interview_flutter/presentation/delegates/search_city_delegate.dart';
+import 'dart:async';
 
-class CustomModal extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../domain/entities/city.dart';
+import '../../providers/providers.dart';
+
+class CustomModal extends ConsumerStatefulWidget {
   const CustomModal({
     super.key,
   });
 
   @override
-  State<CustomModal> createState() => _CustomModalState();
+  CustomModalState createState() => CustomModalState();
 }
 
-class _CustomModalState extends State<CustomModal> {
+class CustomModalState extends ConsumerState<CustomModal> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String? _selectedCityKey;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    //_descriptionController.dispose();
+    //_cityController.dispose();
+    super.dispose();
+  }
+
+  void onButtomTapped() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        final String selectedCity = _cityController.text;
+        final String description = _descriptionController.text;
+
+        // Aquí puedes manejar la lógica para guardar la ciudad y la descripción
+        print('Selected City: $selectedCity');
+        print('City Key: $_selectedCityKey');
+        print('Description: $description');
+        Navigator.pop(context);
+      });
+    } else {
+      setState(() {
+        null;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    void onButtomTapped() {
-      if (_formKey.currentState!.validate()) {
-        setState(() {
-          // Aquí puedes añadir la lógica para guardar la ciudad.
-          Navigator.pop(context);
-        });
-      } else {
-        setState(() {
-          null;
-        });
-      }
-    }
-
     return Form(
       key: _formKey,
       child: Padding(
@@ -49,33 +75,18 @@ class _CustomModalState extends State<CustomModal> {
                 borderRadius: BorderRadius.circular(2.0),
               ),
             ),
-            const SizedBox(
-                height: 30), // Espacio entre la línea y el campo Add City
-            TextFormField(
-              onChanged: (value) {
-                showSearch(
-                  context: context, 
-                  delegate: SearchCityDelegate()
-                );
+            const SizedBox(height: 30), // Espacio entre la línea y el campo Add City
+            _CityFormField(
+              cityController: _cityController,
+              onCitySelected: (key) {
+                setState(() {
+                  _selectedCityKey = key;
+                });
               },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some valid city.';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                labelText: 'Add City',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
             ),
             const SizedBox(height: 16),
             TextFormField(
-              onChanged: ((value) {
-                showSearch(context: context, delegate: SearchCityDelegate());
-              }),
+              controller: _descriptionController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter some description.';
@@ -96,6 +107,109 @@ class _CustomModalState extends State<CustomModal> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CityFormField extends ConsumerStatefulWidget {
+  final TextEditingController cityController;
+  final ValueChanged<String> onCitySelected;
+
+  const _CityFormField({
+    required this.cityController,
+    required this.onCitySelected,
+  });
+
+  @override
+  CityFormFieldState createState() => CityFormFieldState();
+}
+
+class CityFormFieldState extends ConsumerState<_CityFormField> {
+  late TextEditingController _controller;
+  List<City> cities = [];
+  Timer? _debounce;
+  String? _selectedCityKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.cityController;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      // Aquí es donde realizamos la búsqueda
+      setState(() {
+        cities.clear();
+        if (value.isNotEmpty) {
+          ref.read(getCitiesProvider.notifier).loadNextSearch(value);
+          print(value);
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    cities = ref.watch(getCitiesProvider);
+    return Column(
+      children: [
+        TextFormField(
+          controller: _controller,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter some valid city.';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            labelText: 'Add City',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+          onChanged: _onSearchChanged,
+        ),
+        if (cities.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              color: Colors.grey[200],
+            ),
+            child: SizedBox(
+              height: 100,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: cities.length,
+                itemBuilder: (context, index) {
+                  final city = cities[index];
+                  return ListTile(
+                    title: Text(city.localizedName),
+                    onTap: () {
+                      _controller.text = city.localizedName;
+                      setState(() {
+                        cities.clear();
+                        _selectedCityKey = city.key;
+                      });
+                      widget.onCitySelected(_selectedCityKey!);
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -1,5 +1,5 @@
 class City {
-  final int key;
+  final String key;
   final String localizedName;
   final String countryName;
 

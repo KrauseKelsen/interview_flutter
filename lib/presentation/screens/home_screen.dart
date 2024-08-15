@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interview_flutter/presentation/screens/views/settings_view.dart';
 import '../widgets/widgets.dart';
 import 'screens.dart';
 
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final views = [
       const HomeView(),
       const MyLocationsView(),
+      const SettingsView(),
     ];
 
     return Scaffold(

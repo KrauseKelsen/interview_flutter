@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:interview_flutter/config/router/app_router.dart';
 import 'package:interview_flutter/config/theme/app_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
-  runApp(const MainApp());
+Future<void> main() async {
+  await dotenv.load(fileName: '.env');
+  runApp(
+    const ProviderScope(child: MainApp())
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -12,10 +17,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme(selectedColor: 3).getTheme(),
-        title: 'WeatherForemost',
-        routerConfig: appRouter,
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme(selectedColor: 3).getTheme(),
+      title: 'WeatherForemost',
+      routerConfig: appRouter,
     );
   }
 }
