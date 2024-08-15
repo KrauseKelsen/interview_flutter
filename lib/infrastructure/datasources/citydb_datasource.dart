@@ -22,7 +22,7 @@ class CityDBDatasource extends CitiesDataSource {
     
     final results = CityDbResponse.fromJsonList(response.data);
 
-    final List<City> cities = results.map((cityDb) => CityMapper.cityDBTOoEntity(cityDb)).toList();
+    final List<City> cities = results.map((cityDb) => CityMapper.cityDBToEntity(cityDb)).toList();
     return cities;
   }
 }

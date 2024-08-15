@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/city.dart';
 import '../../providers/providers.dart';
+import '../widgets.dart';
 
 class CustomModal extends ConsumerStatefulWidget {
+  final Function(String cityKey, String cityName, String description) onCitySaved;
   const CustomModal({
+    required this.onCitySaved,
     super.key,
   });
 
@@ -39,10 +42,12 @@ class CustomModalState extends ConsumerState<CustomModal> {
         final String selectedCity = _cityController.text;
         final String description = _descriptionController.text;
 
-        // Aquí puedes manejar la lógica para guardar la ciudad y la descripción
         print('Selected City: $selectedCity');
         print('City Key: $_selectedCityKey');
         print('Description: $description');
+
+        widget.onCitySaved(_selectedCityKey ?? "", selectedCity, description);
+        
         Navigator.pop(context);
       });
     } else {
@@ -210,39 +215,6 @@ class CityFormFieldState extends ConsumerState<_CityFormField> {
             ),
           ),
       ],
-    );
-  }
-}
-
-class CustomButtom extends StatelessWidget {
-  final void Function() onButtomTapped;
-
-  const CustomButtom({
-    super.key,
-    required this.onButtomTapped,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return FilledButton(
-      onPressed: onButtomTapped,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: colors.primary, // Cambia el color aquí
-        minimumSize: const Size(double.infinity, 50), // Ancho completo
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      child: const Text(
-        'Save City',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
     );
   }
 }

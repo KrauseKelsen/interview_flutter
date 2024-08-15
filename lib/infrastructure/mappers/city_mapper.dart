@@ -3,7 +3,7 @@ import 'package:interview_flutter/infrastructure/models/citydb/citydb_response.d
 import '../../domain/entities/city.dart';
 
 class CityMapper {
-  static City cityDBTOoEntity(CityDbResponse citydbresponse) =>
+  static City cityDBToEntity(CityDbResponse citydbresponse) =>
     City(
       key: citydbresponse.key, 
       localizedName: citydbresponse.localizedName, 
