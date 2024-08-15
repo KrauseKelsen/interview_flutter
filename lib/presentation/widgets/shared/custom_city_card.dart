@@ -4,7 +4,7 @@ class CityCard extends StatelessWidget {
   final String cityName;
   final String description;
   final String time;
-  final IconData icon;
+  final Icon icon;
 
   const CityCard({super.key, 
     required this.cityName,
@@ -55,11 +55,7 @@ class CityCard extends StatelessWidget {
           const Spacer(),
           Column(
             children: [
-              Icon(
-                icon,
-                color: Colors.orange,
-                size: 24.0,
-              ),
+              icon,
               const SizedBox(height: 4.0),
               Text(
                 time,
