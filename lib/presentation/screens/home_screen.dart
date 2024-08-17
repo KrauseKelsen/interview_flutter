@@ -54,6 +54,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     //currentConditions = ref.watch(getCurrentConditionsProvider);
+    print('Init state Home screen');
   }
 
   @override
@@ -78,10 +79,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    currentConditions.clear();
     currentConditions = ref.watch(getCurrentConditionsProvider);
-    
-    if(currentConditions.isNotEmpty){
-      cityConditions.add(mapCurrentConditionsToCityConditions(currentConditions, cityKey, cityName, description));
+
+    if (currentConditions.isNotEmpty) {
+      currentConditions = ref.watch(getCurrentConditionsProvider);
+      cityConditions.add(mapCurrentConditionsToCityConditions(
+          currentConditions, cityKey, cityName, description));
     }
 
     final colors = Theme.of(context).colorScheme;
